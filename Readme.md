@@ -8,7 +8,7 @@ Try out Resistor Mastery here: [https://mahamadfaizpatel.github.io/resistorMaste
 
 ## Screenshot
 
-![Resistor Mastery Screenshot](path/to/your/screenshot.png)
+![Resistor Mastery Screenshot](images/image.png)
 
 
 ## Features
