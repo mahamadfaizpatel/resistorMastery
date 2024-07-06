@@ -1,0 +1,285 @@
+<html><head><base href="https://resistor-mastery.websim.ai" />
+<title>Resistor Mastery - Advanced Electronics Learning</title>
+<style>
+  :root {
+    --primary-color: #6a4c93;
+    --secondary-color: #1a1a2e;
+    --accent-color: #f8b500;
+    --text-color: #f8f8f8;
+    --bg-color: #16213e;
+  }
+  body, html {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  .container {
+    max-width: 600px;
+    width: 90%;
+    background-color: rgba(22, 33, 62, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+  h1 {
+    color: var(--accent-color);
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+  }
+  #resistor {
+    width: 300px;
+    height: 80px;
+    background-color: #e6e6e6;
+    margin: 2rem auto;
+    position: relative;
+    border-radius: 40px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  .band {
+    width: 25px;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+  }
+  #band1 { left: 60px; border-radius: 40px 0 0 40px; }
+  #band2 { left: 110px; }
+  #band3 { left: 160px; }
+  #multiplier { right: 60px; border-radius: 0 40px 40px 0; }
+  #value-input {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1rem;
+    margin: 1rem 0;
+    background-color: rgba(255,255,255,0.1);
+    border: none;
+    border-radius: 5px;
+    color: var(--text-color);
+    transition: all 0.3s ease;
+  }
+  #value-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent-color);
+  }
+  .btn-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+  .btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 0.5rem;
+  }
+  .btn:hover {
+    background-color: #8a65c0;
+    transform: translateY(-2px);
+  }
+  #result {
+    margin-top: 1rem;
+    font-weight: bold;
+    text-align: center;
+    font-size: 1.2rem;
+    height: 1.5rem;
+  }
+  #score-display, #timer {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: var(--accent-color);
+  }
+  #mode-selector {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  #color-selector {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+  .color-option {
+    width: 30px;
+    height: 30px;
+    margin: 5px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid var(--text-color);
+  }
+  .color-option:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 10px rgba(248, 181, 0, 0.5);
+  }
+  #color-code-info {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--accent-color);
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Resistor Mastery</h1>
+    
+    <div id="mode-selector">
+      <button class="btn" onclick="setMode('practice')">Practice</button>
+      <button class="btn" onclick="setMode('timed')">Timed</button>
+      <button class="btn" onclick="setMode('challenge')">Challenge</button>
+    </div>
+
+    <div id="score-display">Score: <span id="score">0</span></div>
+    <div id="timer" style="display: none;">Time: <span id="time-left">60</span>s</div>
+
+    <div id="resistor">
+      <div id="band1" class="band"></div>
+      <div id="band2" class="band"></div>
+      <div id="band3" class="band"></div>
+      <div id="multiplier" class="band"></div>
+    </div>
+
+    <div id="color-selector"></div>
+
+    <input type="number" id="value-input" placeholder="Resistance (Ω)">
+    <div class="btn-container">
+      <button class="btn" onclick="checkAnswer()">Submit</button>
+    </div>
+
+    <div id="result"></div>
+    <div id="color-code-info">
+      Black: 0, Brown: 1, Red: 2, Orange: 3, Yellow: 4<br>
+      Green: 5, Blue: 6, Violet: 7, Gray: 8, White: 9
+    </div>
+  </div>
+
+  <script>
+    const colorCodes = {
+      black: 0, brown: 1, red: 2, orange: 3, yellow: 4,
+      green: 5, blue: 6, violet: 7, gray: 8, white: 9
+    };
+    const multipliers = {
+      black: 1, brown: 10, red: 100, orange: 1000, yellow: 10000,
+      green: 100000, blue: 1000000, violet: 10000000
+    };
+    let currentResistance = 0;
+    let score = 0;
+    let timeLeft = 60;
+    let timerInterval;
+    let currentMode = 'practice';
+    let difficulty = 1;
+
+    function setMode(mode) {
+      currentMode = mode;
+      resetGame();
+      document.getElementById('timer').style.display = mode === 'timed' ? 'block' : 'none';
+      document.getElementById('color-selector').style.display = mode === 'challenge' ? 'none' : 'flex';
+      document.getElementById('color-code-info').style.display = mode === 'challenge' ? 'none' : 'block';
+      if (mode === 'timed') startTimer();
+      else clearInterval(timerInterval);
+    }
+
+    function resetGame() {
+      score = 0;
+      difficulty = 1;
+      updateScoreDisplay();
+      generateResistor();
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      timeLeft = 60;
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          alert(`Time's up! Final score: ${score}`);
+          resetGame();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      document.getElementById('time-left').textContent = timeLeft;
+    }
+
+    function updateScoreDisplay() {
+      document.getElementById('score').textContent = score;
+    }
+
+    function getRandomColor(isMultiplier = false) {
+      const colors = isMultiplier ? Object.keys(multipliers) : Object.keys(colorCodes);
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    function generateResistor() {
+      const band1 = getRandomColor();
+      const band2 = getRandomColor();
+      const band3 = getRandomColor();
+      const multiplierColor = getRandomColor(true);
+
+      document.getElementById('band1').style.backgroundColor = band1;
+      document.getElementById('band2').style.backgroundColor = band2;
+      document.getElementById('band3').style.backgroundColor = band3;
+      document.getElementById('multiplier').style.backgroundColor = multiplierColor;
+
+      currentResistance = (colorCodes[band1] * 100 + colorCodes[band2] * 10 + colorCodes[band3]) * multipliers[multiplierColor];
+    }
+
+    function checkAnswer() {
+      const userAnswer = parseInt(document.getElementById('value-input').value);
+      const result = document.getElementById('result');
+      
+      if (userAnswer === currentResistance) {
+        result.textContent = "Correct!";
+        result.style.color = "#4caf50";
+        score += difficulty;
+        if (currentMode === 'challenge') difficulty++;
+      } else {
+        result.textContent = `Incorrect. It was ${currentResistance}Ω.`;
+        result.style.color = "#f44336";
+        if (currentMode === 'challenge') difficulty = Math.max(1, difficulty - 1);
+      }
+
+      updateScoreDisplay();
+      document.getElementById('value-input').value = "";
+      generateResistor();
+
+      if (currentMode === 'timed') {
+        timeLeft = Math.min(timeLeft + 5, 60);
+        updateTimerDisplay();
+      }
+    }
+
+    generateResistor();
+
+    // Initialize color selector for practice and timed modes
+    const colorSelector = document.getElementById('color-selector');
+    Object.keys(colorCodes).forEach(color => {
+      const colorOption = document.createElement('div');
+      colorOption.className = 'color-option';
+      colorOption.style.backgroundColor = color;
+      colorOption.title = `${color}: ${colorCodes[color]}`;
+      colorSelector.appendChild(colorOption);
+    });
+  </script>
+</body></html>
